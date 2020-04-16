@@ -30,19 +30,20 @@ a = random.uniform(MIN_A, MAX_A)
 pdf = get_distribution_f(a)
 inv_cdf = get_inverse_distribution_cdf(a)
 
-X = np.linspace(0, 1, num = 100)
-Y_dist = pdf(X)
-# Y1 = X + 2*np.random.random(X.shape)
-# Y2 = X**2 + np.random.random(X.shape)
-# plt.scatter(X,Y1,color='k')
-# plt.scatter(X,Y2,color='g')
-axes = plt.gca()
-axes.set_xlim([0, 1])
-# The maximum y value possible will be found at one of the extremes of either the distribution with minimum or maximum a
+# Credit: https://jakevdp.github.io/blog/2012/08/18/matplotlib-animation-tutorial/
+fig = plt.figure()
 max_y = max(get_distribution_f(MIN_A)(0),
             get_distribution_f(MIN_A)(1),
             get_distribution_f(MAX_A)(0),
             get_distribution_f(MAX_A)(1))
+ax = plt.axes(xlim = (0, 1), ylim = (0, max_y))
+# Show actual paranoia line: 
+plt.axvline(x=0.91, linewidth=4, color='k')
+line, = ax.plot([], [])
+
+X = np.linspace(0, 1, num = 100)
+Y_dist = pdf(X)
+# The maximum y value possible will be found at one of the extremes of either the distribution with minimum or maximum a
             
 # q = np.random.rand(10000)
 # results = [inv_cdf(i) for i in q]
@@ -50,7 +51,5 @@ max_y = max(get_distribution_f(MIN_A)(0),
 # res = np.mean(results)
 # expected = (a + 6.0)/12.0
 # print(res, expected, res/expected)
-axes.set_ylim([0, max_y])
 plt.plot(X, Y_dist)
-plt.axvline(x=0.91, linewidth=4, color='k')
 plt.show()
