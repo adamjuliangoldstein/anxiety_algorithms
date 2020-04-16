@@ -1,5 +1,6 @@
 import numpy as np
-import pylab as plt
+from matplotlib import pyplot as plt
+from matplotlib import animation
 import random
 from scipy import stats
 
@@ -26,12 +27,9 @@ def get_inverse_distribution_cdf(a):
     # cdf^-1(x):
     return lambda x: (1 / (2*a))*((a - 2.0) + np.sqrt(a**2 + 8*a*x - 4*a + 4))
 
-a = random.uniform(MIN_A, MAX_A)
-pdf = get_distribution_f(a)
-inv_cdf = get_inverse_distribution_cdf(a)
-
-# Credit: https://jakevdp.github.io/blog/2012/08/18/matplotlib-animation-tutorial/
+# Credit for animation tutorial: https://jakevdp.github.io/blog/2012/08/18/matplotlib-animation-tutorial/
 fig = plt.figure()
+# The maximum y value possible will be found at one of the extremes of either the distribution with minimum or maximum a
 max_y = max(get_distribution_f(MIN_A)(0),
             get_distribution_f(MIN_A)(1),
             get_distribution_f(MAX_A)(0),
@@ -40,16 +38,26 @@ ax = plt.axes(xlim = (0, 1), ylim = (0, max_y))
 # Show actual paranoia line: 
 plt.axvline(x=0.91, linewidth=4, color='k')
 line, = ax.plot([], [])
+axes.set_ylim([0, max_y])
 
-X = np.linspace(0, 1, num = 100)
-Y_dist = pdf(X)
-# The maximum y value possible will be found at one of the extremes of either the distribution with minimum or maximum a
-            
+def init():
+    line.set_data([], [])
+    return line,
+
+def animate(i):
+    a = random.uniform(MIN_A, MAX_A)
+    pdf = get_distribution_f(a)
+    inv_cdf = get_inverse_distribution_cdf(a)
+    X = np.linspace(0, 1, num = 100)
+    Y = pdf(X)
+    line.set_data(X, Y)
+    return line,
+                
 # q = np.random.rand(10000)
 # results = [inv_cdf(i) for i in q]
 # print("a = " + str(a))
 # res = np.mean(results)
 # expected = (a + 6.0)/12.0
 # print(res, expected, res/expected)
-plt.plot(X, Y_dist)
+anim = animation.FuncAnimation(fig, animate, init_func = init, frames = 100, interval = 200, blit = True)
 plt.show()
