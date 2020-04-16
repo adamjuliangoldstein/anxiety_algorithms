@@ -3,7 +3,7 @@ import pylab as plt
 import random
 from scipy import stats
 
-def get_random_distribution_f():
+def get_random_distribution_f(a):
     # Define a probability density function f(T) = a*T + b,
     # where f(T) represents the relative likelihood to encounter
     # threat likelihoods 0 ≤ T ≤ 1.
@@ -14,12 +14,13 @@ def get_random_distribution_f():
     # b = 1 - (a/2)
     # So f(T) = a*T + 1 - (a/2)
     # For ease of visualization let a be in the range [-1, 1]
-    a = random.uniform(-1, 1)
     b = 1 - (a / 2)
     print(a, b)
     return lambda T: a*T + b
 
-pdf = get_random_distribution_f()
+
+a = random.uniform(-1, 1)
+pdf = get_random_distribution_f(a)
 
 X = np.linspace(0, 1, num = 100)
 Y_dist = pdf(X)
