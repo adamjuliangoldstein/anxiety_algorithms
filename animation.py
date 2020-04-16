@@ -38,7 +38,6 @@ ax = plt.axes(xlim = (0, 1), ylim = (0, max_y))
 # Show actual paranoia line: 
 plt.axvline(x=0.91, linewidth=4, color='k')
 line, = ax.plot([], [])
-axes.set_ylim([0, max_y])
 
 def init():
     line.set_data([], [])
