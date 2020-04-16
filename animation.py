@@ -3,7 +3,10 @@ import pylab as plt
 import random
 from scipy import stats
 
-def get_random_distribution_f(a):
+MIN_A = -1
+MAX_A = 1
+
+def get_distribution_f(a):
     # Define a probability density function f(T) = a*T + b,
     # where f(T) represents the relative likelihood to encounter
     # threat likelihoods 0 ≤ T ≤ 1.
@@ -15,12 +18,11 @@ def get_random_distribution_f(a):
     # So f(T) = a*T + 1 - (a/2)
     # For ease of visualization let a be in the range [-1, 1]
     b = 1 - (a / 2)
-    print(a, b)
     return lambda T: a*T + b
 
 
-a = random.uniform(-1, 1)
-pdf = get_random_distribution_f(a)
+a = random.uniform(MIN_A, MAX_A)
+pdf = get_distribution_f(a)
 
 X = np.linspace(0, 1, num = 100)
 Y_dist = pdf(X)
@@ -28,6 +30,14 @@ Y_dist = pdf(X)
 # Y2 = X**2 + np.random.random(X.shape)
 # plt.scatter(X,Y1,color='k')
 # plt.scatter(X,Y2,color='g')
+axes = plt.gca()
+axes.set_xlim([0, 1])
+# The maximum y value possible will be found at one of the extremes of either the distribution with minimum or maximum a
+max_y = max(get_distribution_f(MIN_A)(0),
+            get_distribution_f(MIN_A)(1),
+            get_distribution_f(MAX_A)(0),
+            get_distribution_f(MAX_A)(1))
+axes.set_ylim([0, max_y])
 plt.plot(X, Y_dist)
 plt.axvline(x=0.91, linewidth=4, color='k')
 plt.show()
