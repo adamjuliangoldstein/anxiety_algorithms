@@ -53,26 +53,30 @@ plt.axvline(x=0.91, linewidth=4, color='k')
 line, = ax.plot([], [])
 new_input = ax.scatter([], [], marker = 'v')
 new_output = ax.scatter([], [], marker = '^')
+counter = 0
+inv_cdf = None
 
 def init():
-    global line, new_input, new_output
+    global line, new_input, new_output, counter, inv_cdf
     line.set_data([], [])
     new_input.set_offsets(np.c_[0, 0])
     new_output.set_offsets(np.c_[0, 0])
     return line, new_input, new_output
 
 def animate(i):
-    global line, new_input, new_output
-    a = random.uniform(MIN_A, MAX_A)
-    pdf = get_distribution_f(a)
-    inv_cdf = get_inverse_distribution_cdf(a)
-    X = np.linspace(0, 1, num = 100)
-    Y = pdf(X)
-    line.set_data(X, Y)
+    global line, new_input, new_output, counter, inv_cdf
+    if counter % 25 == 0:
+        a = random.uniform(MIN_A, MAX_A)
+        pdf = get_distribution_f(a)
+        inv_cdf = get_inverse_distribution_cdf(a)
+        X = np.linspace(0, 1, num = 100)
+        Y = pdf(X)
+        line.set_data(X, Y)
     _i = inv_cdf(random.rand())
     _o = process_input(_i)
     new_input.set_offsets(np.c_[_i, 0.1])
     new_output.set_offsets(np.c_[_o, 0.05])
+    counter += 1
     return line, new_input, new_output
 
 # q = np.random.rand(10000)
@@ -81,5 +85,5 @@ def animate(i):
 # res = np.mean(results)
 # expected = (a + 6.0)/12.0
 # print(res, expected, res/expected)
-anim = animation.FuncAnimation(fig, animate, init_func = init, frames = 100, interval = 2000, blit = True)
+anim = animation.FuncAnimation(fig, animate, init_func = init, frames = 100, interval = 1000, blit = True)
 plt.show()
