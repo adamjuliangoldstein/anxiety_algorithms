@@ -49,22 +49,25 @@ max_y = max(get_distribution_f(MIN_A)(0),
             get_distribution_f(MAX_A)(1))
 ax = plt.axes(xlim = (0, 1), ylim = (0, max_y))
 # Show actual paranoia line: 
-plt.axvline(x=0.91, linewidth=4, color='k')
+plt.axvline(x = 0.91, linewidth = 4, color='k')
 line, = ax.plot([], [])
 new_input = ax.scatter([], [], marker = 'v')
 new_output = ax.scatter([], [], marker = '^')
+guess_line, = ax.plot([], [])
 counter = 0
 inv_cdf = None
+guess_value = 0.5
 
 def init():
-    global line, new_input, new_output, counter, inv_cdf
+    global line, new_input, new_output, guess_line, counter, inv_cdf, guess_value
     line.set_data([], [])
     new_input.set_offsets(np.c_[0, 0])
     new_output.set_offsets(np.c_[0, 0])
-    return line, new_input, new_output
+    guess_line.set_data([guess_value, guess_value], [0, max_y])
+    return line, new_input, new_output, guess_line
 
 def animate(i):
-    global line, new_input, new_output, counter, inv_cdf
+    global line, new_input, new_output, guess_line, counter, inv_cdf, guess_value
     if counter % 25 == 0:
         a = random.uniform(MIN_A, MAX_A)
         pdf = get_distribution_f(a)
@@ -76,8 +79,11 @@ def animate(i):
     _o = process_input(_i)
     new_input.set_offsets(np.c_[_i, 0.1])
     new_output.set_offsets(np.c_[_o, 0.05])
+    # TODO Update guess value based on results!
+    guess_value += 0.1
+    guess_line.set_data([guess_value, guess_value], [0, max_y])
     counter += 1
-    return line, new_input, new_output
+    return line, new_input, new_output, guess_line
 
 # q = np.random.rand(10000)
 # results = [inv_cdf(i) for i in q]
