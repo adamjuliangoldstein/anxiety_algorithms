@@ -69,7 +69,7 @@ def animate(i):
     X = np.linspace(0, 1, num = 100)
     Y = pdf(X)
     line.set_data(X, Y)
-    _i = random.uniform(0, 1)
+    _i = inv_cdf(random.rand())
     _o = process_input(_i)
     new_input.set_offsets(np.c_[_i, 0.1])
     new_output.set_offsets(np.c_[_o, 0.05])
