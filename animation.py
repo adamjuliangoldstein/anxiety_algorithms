@@ -57,6 +57,8 @@ guess_line, = ax.plot([], [])
 counter = 0
 inv_cdf = None
 guess_value = 0.5
+last_input = None
+last_output = None
 
 def init():
     global line, new_input, new_output, guess_line, counter, inv_cdf, guess_value
@@ -67,7 +69,7 @@ def init():
     return line, new_input, new_output, guess_line
 
 def animate(i):
-    global line, new_input, new_output, guess_line, counter, inv_cdf, guess_value
+    global line, new_input, new_output, guess_line, counter, inv_cdf, guess_value, last_input, last_output
     if counter % 25 == 0:
         a = random.uniform(MIN_A, MAX_A)
         pdf = get_distribution_f(a)
@@ -76,11 +78,12 @@ def animate(i):
         Y = pdf(X)
         line.set_data(X, Y)
     if counter % 2 == 1:
-        _i = inv_cdf(random.rand())
-        _o = process_input(_i)
-        new_input.set_offsets(np.c_[_i, 0.1])
-        new_output.set_offsets(np.c_[_o, 0.05])
-    else:
+        last_input = inv_cdf(random.rand())
+        last_output = process_input(last_input)
+        new_input.set_offsets(np.c_[last_input, 0.1])
+        new_output.set_offsets(np.c_[last_output, 0.05])
+    elif counter > 1:
+        print(last_output)
         # TODO Update guess value based on results!
         guess_value += 0.1
         guess_line.set_data([guess_value, guess_value], [0, max_y])
