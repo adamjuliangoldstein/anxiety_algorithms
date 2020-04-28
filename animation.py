@@ -10,7 +10,7 @@ MAX_A = 1
 NOISE_MU = 0
 #NOISE_SIGMA = 0.1
 NOISE_SIGMA = 0
-FRAMES_PER_ANIMATION = 1000
+FRAMES_PER_ANIMATION = 2500
 
 global attack_adjustment, chill_adjustment, run_results
 
@@ -65,6 +65,35 @@ def survives(is_a_threat, will_attack):
         raise
     return random.random() < survival_odds
 
+def _best_run():
+    # Sort run_results so the best-performing experiment is first
+    sorted_run_results = sorted(run_results, key = lambda x: -x[-1])
+    return sorted_run_results[0]
+
+def _best_run_chill_adjustment():
+    return _best_run()[0]
+
+def _best_run_attack_adjustment():
+    return _best_run()[1]
+    
+def new_chill_adjustment():
+    candidate = _best_run_chill_adjustment() + random.normal(0, 0.1)
+    if candidate < 0:
+        return 0
+    elif candidate > 1:
+        return 1
+    else:
+        return candidate
+        
+def new_attack_adjustment():
+    candidate = _best_run_attack_adjustment() + random.normal(0, 0.1)
+    if candidate < 0:
+        return 0
+    elif candidate > 1:
+        return 1
+    else:
+        return candidate
+
 def init():
     global line, new_input, new_output, guess_line, counter, inv_cdf, guessed_pl
     line.set_data([], [])
@@ -116,32 +145,34 @@ def animate(i):
 
 run_results = []
 chill_adjustment = 0.5
-while chill_adjustment <= 1.001:
-    attack_adjustment = 0.5
-    while attack_adjustment <= 1.001:
-        # Credit for animation tutorial: https://jakevdp.github.io/blog/2012/08/18/matplotlib-animation-tutorial/
-        fig = plt.figure()
-        # The maximum y value possible will be found at one of the extremes of either
-        # the distribution with minimum or maximum a
-        max_y = max(get_distribution_f(MIN_A)(0),
-                    get_distribution_f(MIN_A)(1),
-                    get_distribution_f(MAX_A)(0),
-                    get_distribution_f(MAX_A)(1))
-        ax = plt.axes(xlim = (0, 1), ylim = (0, max_y))
-        # Show actual paranoia line: 
-        plt.axvline(x = 0.91, linewidth = 4, color='k')
-        line, = ax.plot([], [])
-        new_input = ax.scatter([], [], marker = 'v')
-        new_output = ax.scatter([], [], marker = '^')
-        guess_line, = ax.plot([], [])
-        counter = 0
-        inv_cdf = None
-        guessed_pl = 0.5
-        last_input = None
-        last_output = None
-        times_surviving = 0
-        encounters = 0
-        anim = animation.FuncAnimation(fig, animate, init_func = init, frames = FRAMES_PER_ANIMATION, interval = 1, repeat = False, blit = True)
-        plt.show()
-        attack_adjustment += 0.01
-    chill_adjustment += 0.01
+attack_adjustment = 0.5
+while True:
+    # Credit for animation tutorial: https://jakevdp.github.io/blog/2012/08/18/matplotlib-animation-tutorial/
+    fig = plt.figure()
+    # The maximum y value possible will be found at one of the extremes of 
+    # either the distribution with minimum or maximum a
+    max_y = max(get_distribution_f(MIN_A)(0),
+                get_distribution_f(MIN_A)(1),
+                get_distribution_f(MAX_A)(0),
+                get_distribution_f(MAX_A)(1))
+    ax = plt.axes(xlim = (0, 1), ylim = (0, max_y))
+    # Show actual paranoia line: 
+    plt.axvline(x = 0.91, linewidth = 4, color='k')
+    line, = ax.plot([], [])
+    new_input = ax.scatter([], [], marker = 'v')
+    new_output = ax.scatter([], [], marker = '^')
+    guess_line, = ax.plot([], [])
+    counter = 0
+    inv_cdf = None
+    guessed_pl = 0.5
+    last_input = None
+    last_output = None
+    times_surviving = 0
+    encounters = 0
+    anim = animation.FuncAnimation(fig, animate, init_func = init,
+                                   frames = FRAMES_PER_ANIMATION,
+                                   interval = 1, repeat = False, blit = True)
+    plt.show()
+    print(_best_run())
+    chill_adjustment = new_chill_adjustment()
+    attack_adjustment = new_attack_adjustment()
