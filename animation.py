@@ -75,13 +75,15 @@ def animate(i):
         X = np.linspace(0, 1, num = 100)
         Y = pdf(X)
         line.set_data(X, Y)
-    _i = inv_cdf(random.rand())
-    _o = process_input(_i)
-    new_input.set_offsets(np.c_[_i, 0.1])
-    new_output.set_offsets(np.c_[_o, 0.05])
-    # TODO Update guess value based on results!
-    guess_value += 0.1
-    guess_line.set_data([guess_value, guess_value], [0, max_y])
+    if counter % 2 == 1:
+        _i = inv_cdf(random.rand())
+        _o = process_input(_i)
+        new_input.set_offsets(np.c_[_i, 0.1])
+        new_output.set_offsets(np.c_[_o, 0.05])
+    else:
+        # TODO Update guess value based on results!
+        guess_value += 0.1
+        guess_line.set_data([guess_value, guess_value], [0, max_y])
     counter += 1
     return line, new_input, new_output, guess_line
 
@@ -91,5 +93,5 @@ def animate(i):
 # res = np.mean(results)
 # expected = (a + 6.0)/12.0
 # print(res, expected, res/expected)
-anim = animation.FuncAnimation(fig, animate, init_func = init, frames = 100, interval = 1000, blit = True)
+anim = animation.FuncAnimation(fig, animate, init_func = init, frames = 100, interval = 500, blit = True)
 plt.show()
