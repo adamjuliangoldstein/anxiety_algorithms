@@ -6,8 +6,13 @@ from scipy import stats
 
 MIN_A = -1
 MAX_A = 1
-NOISE_MU = -0.05
-NOISE_SIGMA = 0.1
+#NOISE_MU = -0.05
+NOISE_MU = 0
+#NOISE_SIGMA = 0.1
+NOISE_SIGMA = 0
+FRAMES_PER_ANIMATION = 1000
+
+global attack_adjustment, chill_adjustment, run_results
 
 def get_distribution_f(a):
     # Define a probability density function f(T) = a*T + b,
@@ -40,36 +45,44 @@ def process_input(i):
     else:
         return temp_output
 
-# Credit for animation tutorial: https://jakevdp.github.io/blog/2012/08/18/matplotlib-animation-tutorial/
-fig = plt.figure()
-# The maximum y value possible will be found at one of the extremes of either the distribution with minimum or maximum a
-max_y = max(get_distribution_f(MIN_A)(0),
-            get_distribution_f(MIN_A)(1),
-            get_distribution_f(MAX_A)(0),
-            get_distribution_f(MAX_A)(1))
-ax = plt.axes(xlim = (0, 1), ylim = (0, max_y))
-# Show actual paranoia line: 
-plt.axvline(x = 0.91, linewidth = 4, color='k')
-line, = ax.plot([], [])
-new_input = ax.scatter([], [], marker = 'v')
-new_output = ax.scatter([], [], marker = '^')
-guess_line, = ax.plot([], [])
-counter = 0
-inv_cdf = None
-guess_value = 0.5
-last_input = None
-last_output = None
+# Determine whether it's a true or false positive or negative, then roll
+# the dice as appropriate to determine survival
+def survives(is_a_threat, will_attack):
+    if is_a_threat and will_attack:
+        # True positive
+        survival_odds = 1.0
+    elif (not is_a_threat) and will_attack:
+        # False positive
+        survival_odds = 0.9
+    elif (not is_a_threat) and (not will_attack):
+        # True negative
+        survival_odds = 1.0
+    elif is_a_threat and (not will_attack):
+        # False negative
+        survival_odds = 0.0
+    else:
+        # Should never happen
+        raise
+    return random.random() < survival_odds
 
 def init():
-    global line, new_input, new_output, guess_line, counter, inv_cdf, guess_value
+    global line, new_input, new_output, guess_line, counter, inv_cdf, guessed_pl
     line.set_data([], [])
     new_input.set_offsets(np.c_[0, 0])
     new_output.set_offsets(np.c_[0, 0])
-    guess_line.set_data([guess_value, guess_value], [0, max_y])
+    guess_line.set_data([guessed_pl, guessed_pl], [0, max_y])
     return line, new_input, new_output, guess_line
 
 def animate(i):
-    global line, new_input, new_output, guess_line, counter, inv_cdf, guess_value, last_input, last_output
+    global line, new_input, new_output, guess_line
+    global counter, inv_cdf, guessed_pl, last_input, last_output
+    global times_surviving, encounters
+    if i == FRAMES_PER_ANIMATION - 1:
+        plt.close(fig)
+        print("Chill adjustment:", chill_adjustment, "Attack adjustment:", attack_adjustment, "Survivals: ", float(times_surviving) / encounters)
+        run_results.append([chill_adjustment,
+                            attack_adjustment,
+                            float(times_surviving) / encounters])
     if counter % 25 == 0:
         a = random.uniform(MIN_A, MAX_A)
         pdf = get_distribution_f(a)
@@ -83,18 +96,52 @@ def animate(i):
         new_input.set_offsets(np.c_[last_input, 0.1])
         new_output.set_offsets(np.c_[last_output, 0.05])
     elif counter > 1:
-        print(last_output)
-        # TODO Update guess value based on results!
-        guess_value += 0.1
-        guess_line.set_data([guess_value, guess_value], [0, max_y])
+        encounters += 1
+        # The chance it's a threat is given by the input (actual threat level)
+        is_a_threat = (random.random() < last_input)
+        # Whether to attack is given by the risk we perceive is greater or
+        # less than the currently-guessed Paranoia Line
+        will_attack = (last_output < guessed_pl)
+        will_survive = survives(is_a_threat, will_attack)
+        # Adjust the guessed paranoia line depending on whether
+        # Things are safer or not than we expected:
+        if will_survive:
+            times_surviving += 1
+            guessed_pl = guessed_pl * (1.0 - chill_adjustment)
+        else:
+            guessed_pl = guessed_pl + (1.0 - guessed_pl) * attack_adjustment
+        guess_line.set_data([guessed_pl, guessed_pl], [0, max_y])
     counter += 1
     return line, new_input, new_output, guess_line
 
-# q = np.random.rand(10000)
-# results = [inv_cdf(i) for i in q]
-# print("a = " + str(a))
-# res = np.mean(results)
-# expected = (a + 6.0)/12.0
-# print(res, expected, res/expected)
-anim = animation.FuncAnimation(fig, animate, init_func = init, frames = 100, interval = 500, blit = True)
-plt.show()
+run_results = []
+chill_adjustment = 0.5
+while chill_adjustment <= 1.001:
+    attack_adjustment = 0.5
+    while attack_adjustment <= 1.001:
+        # Credit for animation tutorial: https://jakevdp.github.io/blog/2012/08/18/matplotlib-animation-tutorial/
+        fig = plt.figure()
+        # The maximum y value possible will be found at one of the extremes of either
+        # the distribution with minimum or maximum a
+        max_y = max(get_distribution_f(MIN_A)(0),
+                    get_distribution_f(MIN_A)(1),
+                    get_distribution_f(MAX_A)(0),
+                    get_distribution_f(MAX_A)(1))
+        ax = plt.axes(xlim = (0, 1), ylim = (0, max_y))
+        # Show actual paranoia line: 
+        plt.axvline(x = 0.91, linewidth = 4, color='k')
+        line, = ax.plot([], [])
+        new_input = ax.scatter([], [], marker = 'v')
+        new_output = ax.scatter([], [], marker = '^')
+        guess_line, = ax.plot([], [])
+        counter = 0
+        inv_cdf = None
+        guessed_pl = 0.5
+        last_input = None
+        last_output = None
+        times_surviving = 0
+        encounters = 0
+        anim = animation.FuncAnimation(fig, animate, init_func = init, frames = FRAMES_PER_ANIMATION, interval = 1, repeat = False, blit = True)
+        plt.show()
+        attack_adjustment += 0.01
+    chill_adjustment += 0.01
