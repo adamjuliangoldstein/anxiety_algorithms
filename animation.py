@@ -29,10 +29,13 @@ def get_distribution_f(a):
     return lambda T: a*T + b
 
 def get_inverse_distribution_cdf(a):
-    # f(T) = a*T + 1 - (a/2)
-    # cdf(T) = integral(f(T)) = (a/2)*T^2 + (1 - (a/2))*T
-    # cdf^-1(x):
-    return lambda x: (1 / (2*a))*((a - 2.0) + np.sqrt(a**2 + 8*a*x - 4*a + 4))
+    if a == 0:
+        return lambda x: x
+    else:
+        # f(T) = a*T + 1 - (a/2)
+        # cdf(T) = integral(f(T)) = (a/2)*T^2 + (1 - (a/2))*T
+        # cdf^-1(x):
+        return lambda x: (1 / (2*a))*((a - 2.0) + np.sqrt(a**2 + 8*a*x - 4*a + 4))
 
 # Interpret an input with biased random noise
 def process_input(i):
@@ -77,7 +80,7 @@ def _best_run_attack_adjustment():
     return _best_run()[1]
     
 def new_chill_adjustment():
-    candidate = _best_run_chill_adjustment() + random.normal(0, 0.1)
+    candidate = _best_run_chill_adjustment() + random.normal(0, 0.025)
     if candidate < 0:
         return 0
     elif candidate > 1:
@@ -86,7 +89,7 @@ def new_chill_adjustment():
         return candidate
         
 def new_attack_adjustment():
-    candidate = _best_run_attack_adjustment() + random.normal(0, 0.1)
+    candidate = _best_run_attack_adjustment() + random.normal(0, 0.025)
     if candidate < 0:
         return 0
     elif candidate > 1:
@@ -113,7 +116,8 @@ def animate(i):
                             attack_adjustment,
                             float(times_surviving) / encounters])
     if counter % 25 == 0:
-        a = random.uniform(MIN_A, MAX_A)
+        # a = random.uniform(MIN_A, MAX_A)
+        a = 0
         pdf = get_distribution_f(a)
         inv_cdf = get_inverse_distribution_cdf(a)
         X = np.linspace(0, 1, num = 100)
@@ -136,16 +140,16 @@ def animate(i):
         # Things are safer or not than we expected:
         if will_survive:
             times_surviving += 1
-            guessed_pl = guessed_pl * (1.0 - chill_adjustment)
+            guessed_pl = guessed_pl - chill_adjustment
         else:
-            guessed_pl = guessed_pl + (1.0 - guessed_pl) * attack_adjustment
+            guessed_pl = guessed_pl + attack_adjustment
         guess_line.set_data([guessed_pl, guessed_pl], [0, max_y])
     counter += 1
     return line, new_input, new_output, guess_line
 
 run_results = []
-chill_adjustment = 0.5
-attack_adjustment = 0.5
+chill_adjustment = 0.05
+attack_adjustment = 0.05
 while True:
     # Credit for animation tutorial: https://jakevdp.github.io/blog/2012/08/18/matplotlib-animation-tutorial/
     fig = plt.figure()
