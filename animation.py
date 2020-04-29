@@ -28,6 +28,11 @@ def get_distribution_f(a):
     b = 1 - (a / 2)
     return lambda T: a*T + b
 
+def get_distribution_cdf(a):
+    # From prior function, F(T) = (a/2)*T^2 + b*T
+    b = 1 - (a / 2)
+    return lambda T: (a / 2)*(T**2) + b*T
+
 def get_inverse_distribution_cdf(a):
     if a == 0:
         return lambda x: x
@@ -35,7 +40,8 @@ def get_inverse_distribution_cdf(a):
         # f(T) = a*T + 1 - (a/2)
         # cdf(T) = integral(f(T)) = (a/2)*T^2 + (1 - (a/2))*T
         # cdf^-1(x):
-        return lambda x: (1 / (2*a))*((a - 2.0) + np.sqrt(a**2 + 8*a*x - 4*a + 4))
+        return lambda x: (1 / (2*a))*((a - 2.0) +
+                                      np.sqrt(a**2 + 8*a*x - 4*a + 4))
 
 # Interpret an input with biased random noise
 def process_input(i):
