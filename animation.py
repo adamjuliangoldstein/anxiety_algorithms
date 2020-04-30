@@ -156,9 +156,8 @@ def animate(i):
         run_results.append([chill_adjustment,
                             attack_adjustment,
                             float(times_surviving) / encounters])
-    if counter % 25 == 0:
-        # a = random.uniform(MIN_A, MAX_A)
-        a = 0
+    if counter % 251 == 0:
+        a = random.uniform(MIN_A, MAX_A)
         pdf = get_distribution_f(a)
         inv_cdf = get_inverse_distribution_cdf(a)
         X = np.linspace(0, 1, num = 100)
@@ -190,48 +189,49 @@ def animate(i):
         else:
             guessed_c = min(1.0, guessed_c + attack_adjustment)
         # Draw the Paranoia Line by computing it from the Concern Coefficient:
-        guess_line.set_data([p_from_c(guessed_c, a),
-                             p_from_c(guessed_c, a)],
-                            [0, get_distribution_f(a)(p_from_c(guessed_c, a))])
-        avg_guess_line.set_data([_avg_guessed_c(), _avg_guessed_c()],
-                                [0, get_distribution_f(a)(_avg_guessed_c())])
+        guessed_p = p_from_c(guessed_c, a)
+        guess_line.set_data([guessed_p, guessed_p],
+                            [0, get_distribution_f(a)(guessed_p)])
+        avg_guessed_p = p_from_c(_avg_guessed_c(), a)
+        avg_guess_line.set_data([avg_guessed_p, avg_guessed_p],
+                                [0, get_distribution_f(a)(avg_guessed_p)])
     counter += 1
     return line, new_input, new_output, guess_line, avg_guess_line
 
 chill_adjustment = 0.001
 attack_adjustment = chill_adjustment*25
 run_results = []
-while True:
-    outputs_seen = []
-    previously_guessed_cs = []
-    # Credit for animation tutorial: https://jakevdp.github.io/blog/2012/08/18/matplotlib-animation-tutorial/
-    fig = plt.figure()
-    # The maximum y value possible will be found at one of the extremes of 
-    # either the distribution with minimum or maximum a
-    max_y = max(get_distribution_f(MIN_A)(0),
-                get_distribution_f(MIN_A)(1),
-                get_distribution_f(MAX_A)(0),
-                get_distribution_f(MAX_A)(1))
-    ax = plt.axes(xlim = (0, 1), ylim = (0, max_y))
-    # Show actual paranoia line: 
-    plt.axvline(x = 0.91, linewidth = 4, color='k')
-    line, = ax.plot([], [])
-    new_input = ax.scatter([], [], marker = 'v')
-    new_output = ax.scatter([], [], marker = '^')
-    guess_line, = ax.plot([], [])
-    avg_guess_line, = ax.plot([], [])
-    counter = 0
-    inv_cdf = None
-    guessed_c = 0.5
-    last_input = None
-    last_output = None
-    times_surviving = 0
-    times_attacking = 0
-    encounters = 0
-    anim = animation.FuncAnimation(fig, animate, init_func = init,
-                                   frames = FRAMES_PER_ANIMATION,
-                                   interval = 1, repeat = False, blit = True)
-    plt.show()
-    print(_best_run())
-    chill_adjustment = new_chill_adjustment()
-    attack_adjustment = new_attack_adjustment()
+guessed_c = 0.5
+previously_guessed_cs = []
+outputs_seen = []
+#while True:
+# Credit for animation tutorial: https://jakevdp.github.io/blog/2012/08/18/matplotlib-animation-tutorial/
+fig = plt.figure()
+# The maximum y value possible will be found at one of the extremes of 
+# either the distribution with minimum or maximum a
+max_y = max(get_distribution_f(MIN_A)(0),
+            get_distribution_f(MIN_A)(1),
+            get_distribution_f(MAX_A)(0),
+            get_distribution_f(MAX_A)(1))
+ax = plt.axes(xlim = (0, 1), ylim = (0, max_y))
+# Show actual paranoia line: 
+plt.axvline(x = 0.91, linewidth = 4, color='k')
+line, = ax.plot([], [])
+new_input = ax.scatter([], [], marker = 'v')
+new_output = ax.scatter([], [], marker = '^')
+guess_line, = ax.plot([], [])
+avg_guess_line, = ax.plot([], [])
+counter = 0
+inv_cdf = None
+last_input = None
+last_output = None
+times_surviving = 0
+times_attacking = 0
+encounters = 0
+anim = animation.FuncAnimation(fig, animate, init_func = init,
+                               frames = FRAMES_PER_ANIMATION,
+                               interval = 1, repeat = False, blit = True)
+plt.show()
+print(_best_run())
+chill_adjustment = new_chill_adjustment()
+attack_adjustment = new_attack_adjustment()
