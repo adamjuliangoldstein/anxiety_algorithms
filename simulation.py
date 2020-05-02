@@ -21,13 +21,7 @@ class Simulation:
         # Credit for animation tutorial:
         # jakevdp.github.io/blog/2012/08/18/matplotlib-animation-tutorial/
         self.figure = plt.figure()
-        # The maximum y value possible will be found at one of the extremes of 
-        # either the distribution with minimum or maximum a
-        self.max_y = max(Distribution(a = Distribution.min_a).pdf()(0),
-                         Distribution(a = Distribution.min_a).pdf()(1),
-                         Distribution(a = Distribution.max_a).pdf()(0),
-                         Distribution(a = Distribution.max_a).pdf()(1))
-        ax = plt.axes(xlim = (0, 1), ylim = (0, self.max_y))
+        ax = plt.axes(xlim = (0, 1), ylim = (0, Distribution.max_y))
         
         # The actual Paranoia Line:
         plt.axvline(x = self._actual_paranoia_line(), linewidth = 4,
@@ -71,7 +65,7 @@ class Simulation:
         self.chill_polygon.set_xy([[0, 0], [0, 0], [0, 0], [0, 0]])
         self.avg_guess_line.set_data([self.processor.mean_c_guess(),
                                       self.processor.mean_c_guess()],
-                                     [0, self.max_y])
+                                     [0, Distribution.max_y])
         return (self.dist_line, self.input_tri, self.after_noise_tri,
                 self.attack_polygon, self.chill_polygon, self.avg_guess_line)
         

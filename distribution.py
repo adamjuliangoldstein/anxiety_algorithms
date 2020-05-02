@@ -10,6 +10,7 @@ class Distribution:
     # If a < 0, the distribution is skewed towards safer things.
     min_a = -2
     max_a = 2
+    max_y = max(abs(min_a), abs(max_a))
     
     def __init__(self, a = None):
         if a: # If a is specified, use it
