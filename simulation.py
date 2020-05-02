@@ -128,7 +128,6 @@ class Simulation:
         
     def end(self):
         plt.close(self.figure)
-        print("Chill adjustment:", self.processor.chill_adjustment,
-              "Attack adjustment:", self.processor.attack_adjustment,
+        print("Reactivity ratio", self.processor.reactivity_ratio,
               "Survivals: ", self.processor.survival_rate(),
               "Attacks:", self.processor.attack_rate())
