@@ -8,6 +8,7 @@ class Processor:
         self.data_seen = []
         self.c_guess = c_guess
         self.previous_c_guesses = []
+        self.reactivity_ratio = reactivity_ratio
         self.chill_adjustment = chill_adjustment
         self.attack_adjustment = self.chill_adjustment * reactivity_ratio
         self.times_surviving = 0
@@ -55,7 +56,7 @@ class Processor:
         if self.previous_c_guesses:
             return np.mean(self.previous_c_guesses)
         else:
-            return 0.5
+            return self.c_guess
     
     def survival_rate(self):
         if max(self.times_surviving, self.times_dying) > 0:

@@ -12,16 +12,19 @@ from simulation import Simulation
 # TODO: Is prep_animation needed?
 # TODO: Add readme
 # TODO: Change animation.py to the file that handles animation and make a different main file
+# TODO: Fix self.iterationsremaining == 1 in both animated and not animated
+# TODO: Try chopping inputs in half
+# TODO: Measure impact of noise on how reactive you have to be << This could be big
 
 def main():
     run_results = []
     for reactivity_ratio in range(1, 100):
-        sim = Simulation(reactivity_ratio = reactivity_ratio)
+        sim = Simulation(animate = True, reactivity_ratio = reactivity_ratio)
         sim.start()
         run_results.append([reactivity_ratio, sim.processor.survival_rate()])
-        best_run = sorted(run_results, key = lambda x: x[-1])[-1][-1]
+        best_run = sorted(run_results, key = lambda x: x[-1])[-1]
         print(best_run)
-        if best_run > 0.95:
+        if best_run[-1] > 0.95:
             break
     print(run_results)
 

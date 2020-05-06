@@ -8,8 +8,9 @@ from matplotlib import patches
 import numpy as np
 
 class Simulation:
-    def __init__(self, reactivity_ratio = 24, iterations = 5000,
+    def __init__(self, animate = True, reactivity_ratio = 24, iterations = 500,
                  distributions = 10):
+        self.animate = animate
         self.processor = Processor(reactivity_ratio = reactivity_ratio)
         self.reaper = Reaper()
         self.noise = Noise()
@@ -18,34 +19,37 @@ class Simulation:
         self.iterations_per_distribution = round(float(iterations) /
                                                  distributions)
         self.last_input = None
-        # Credit for animation tutorial:
-        # jakevdp.github.io/blog/2012/08/18/matplotlib-animation-tutorial/
-        self.figure = plt.figure()
-        ax = plt.axes(xlim = (0, 1), ylim = (0, Distribution.max_y))
+        if self.animate:
+            # Credit for animation tutorial:
+            # jakevdp.github.io/blog/2012/08/18/matplotlib-animation-tutorial/
+            self.figure = plt.figure()
+            ax = plt.axes(xlim = (0, 1), ylim = (0, Distribution.max_y))
         
-        # The actual Paranoia Line:
-        plt.axvline(x = self._actual_paranoia_line(), linewidth = 4,
-                    color = 'k', alpha = 0.2, zorder = 1)
+            # The actual Paranoia Line:
+            plt.axvline(x = self._actual_paranoia_line(), linewidth = 4,
+                        color = 'k', alpha = 0.2, zorder = 1)
                     
-        # The line showing the distribution of threats:
-        self.dist_line, = ax.plot([], [], color = 'k', zorder = 2)
+            # The line showing the distribution of threats:
+            self.dist_line, = ax.plot([], [], color = 'k', zorder = 2)
 
-        self.input_tri = ax.scatter([], [], marker = 'v', zorder = 5)
-        self.after_noise_tri = ax.scatter([], [], marker = '^', zorder = 5)
-        self.attack_polygon = patches.Polygon([[0,0], [0,0], [0,0], [0,0]],
-                                              alpha = 0.5,
-                                              color = 'r',
-                                              edgecolor = None,
-                                              zorder = 3)
-        self.chill_polygon = patches.Polygon([[0,0], [0,0], [0,0], [0,0]],
-                                             alpha = 0.5,
-                                             color = 'b',
-                                             edgecolor = None,
-                                             zorder = 3)
-        ax.add_patch(self.attack_polygon)
-        ax.add_patch(self.chill_polygon)
-        self.avg_guess_line, = ax.plot([], [], '--', color= 'k', alpha = 0.5,
-                                       zorder = 4)
+            self.input_tri = ax.scatter([], [], color = 'k', marker = 'v',
+                                        zorder = 5)
+            self.after_noise_tri = ax.scatter([], [], color = 'w',
+                                              marker = '^', zorder = 5)
+            self.attack_polygon = patches.Polygon([[0,0], [0,0], [0,0], [0,0]],
+                                                  alpha = 0.5,
+                                                  color = 'r',
+                                                  edgecolor = None,
+                                                  zorder = 3)
+            self.chill_polygon = patches.Polygon([[0,0], [0,0], [0,0], [0,0]],
+                                                 alpha = 0.5,
+                                                 color = 'b',
+                                                 edgecolor = None,
+                                                 zorder = 3)
+            ax.add_patch(self.attack_polygon)
+            ax.add_patch(self.chill_polygon)
+            self.avg_guess_line, = ax.plot([], [], '--', color= 'k',
+                                           alpha = 0.5, zorder = 4)
     
     def _actual_paranoia_line(self):
         # The actual Paranoia Line is the threat likelihood where the odds
@@ -70,12 +74,16 @@ class Simulation:
                 self.attack_polygon, self.chill_polygon, self.avg_guess_line)
         
     def start(self):
-        anim = animation.FuncAnimation(self.figure, self.advance,
-                                       init_func = self.prep_animation,
-                                       frames = self.iterations_remaining,
-                                       interval = 1, repeat = False,
-                                       blit = True)
-        plt.show()
+        if self.animate:
+            anim = animation.FuncAnimation(self.figure, self.advance,
+                                           init_func = self.prep_animation,
+                                           frames = self.iterations_remaining,
+                                           interval = 1, repeat = False,
+                                           blit = True)
+            plt.show()
+        else:
+            while self.iterations_remaining > 1:
+                self.advance(None)
         
     def advance(self, i):
         if self.iterations_remaining == 1:
@@ -84,15 +92,17 @@ class Simulation:
         # If it's time for a new distribution:
         if self.iterations_remaining % self.iterations_per_distribution == 0:
             self.distribution = Distribution()
-            X = np.linspace(0, 1, num = 2)
-            Y = self.distribution.pdf()(X)
-            self.dist_line.set_data(X, Y)
+            if self.animate:
+                X = np.linspace(0, 1, num = 2)
+                Y = self.distribution.pdf()(X)
+                self.dist_line.set_data(X, Y)
         
         if self.iterations_remaining % 2 == 1:
             self.last_input = self.distribution.generate_likelihood()
             self.after_noise = self.noise.adjust(self.last_input)
-            self.input_tri.set_offsets(np.c_[self.last_input, 0.1])
-            self.after_noise_tri.set_offsets(np.c_[self.after_noise, 0.05])
+            if self.animate:
+                self.input_tri.set_offsets(np.c_[self.last_input, 0.1])
+                self.after_noise_tri.set_offsets(np.c_[self.after_noise, 0.05])
         elif self.last_input:
             # The chance it's a threat is given by the input
             # (actual threat level):
@@ -107,24 +117,28 @@ class Simulation:
                 self.processor.survives()
             else:
                 self.processor.dies()
-            # Draw the Paranoia Line by computing it from the Concern Coefficient:
-            p_guess = self.distribution.c_to_p(self.processor.c_guess)
-            pdf = self.distribution.pdf()
-            self.attack_polygon.set_xy([[0, 0],
-                                       [0, pdf(0)],
-                                       [p_guess, pdf(p_guess)],
-                                       [p_guess, 0]])
-            self.chill_polygon.set_xy([[p_guess, pdf(p_guess)],
-                                      [p_guess, 0],
-                                      [1, 0],
-                                      [1, pdf(1)]])
-            avg_p_guess = self.distribution.c_to_p(self.processor.mean_c_guess()
-                                                   )
-            self.avg_guess_line.set_data([avg_p_guess, avg_p_guess],
-                                         [0, pdf(avg_p_guess)])
+                
+            if self.animate:
+                # Draw the Paranoia Line by computing it from the Concern Coefficient:
+                p_guess = self.distribution.c_to_p(self.processor.c_guess)
+                pdf = self.distribution.pdf()
+                self.attack_polygon.set_xy([[0, 0],
+                                           [0, pdf(0)],
+                                           [p_guess, pdf(p_guess)],
+                                           [p_guess, 0]])
+                self.chill_polygon.set_xy([[p_guess, pdf(p_guess)],
+                                          [p_guess, 0],
+                                          [1, 0],
+                                          [1, pdf(1)]])
+                avg_p_guess = self.distribution.c_to_p(self.processor.mean_c_guess()
+                                                       )
+                self.avg_guess_line.set_data([avg_p_guess, avg_p_guess],
+                                             [0, pdf(avg_p_guess)])
         self.iterations_remaining -= 1
-        return (self.dist_line, self.input_tri, self.after_noise_tri,
-                self.attack_polygon, self.chill_polygon, self.avg_guess_line)
+        if self.animate:
+            return (self.dist_line, self.input_tri, self.after_noise_tri,
+                    self.attack_polygon, self.chill_polygon,
+                    self.avg_guess_line)
         
     def end(self):
         plt.close(self.figure)
