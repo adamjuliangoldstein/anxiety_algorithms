@@ -8,7 +8,7 @@ from matplotlib import patches
 import numpy as np
 
 class Simulation:
-    def __init__(self, animate = True, reactivity_ratio = 24, iterations = 500,
+    def __init__(self, animate = True, reactivity_ratio = 24, iterations = 5000,
                  distributions = 10):
         self.animate = animate
         self.processor = Processor(reactivity_ratio = reactivity_ratio)
@@ -48,8 +48,9 @@ class Simulation:
                                                  zorder = 3)
             ax.add_patch(self.attack_polygon)
             ax.add_patch(self.chill_polygon)
+            # Show the average guess line by changing the alpha of this to > 0:
             self.avg_guess_line, = ax.plot([], [], '--', color= 'k',
-                                           alpha = 0.5, zorder = 4)
+                                           alpha = 0.0, zorder = 4)
     
     def _actual_paranoia_line(self):
         # The actual Paranoia Line is the threat likelihood where the odds
@@ -130,8 +131,7 @@ class Simulation:
                                           [p_guess, 0],
                                           [1, 0],
                                           [1, pdf(1)]])
-                avg_p_guess = self.distribution.c_to_p(self.processor.mean_c_guess()
-                                                       )
+                avg_p_guess = self.distribution.c_to_p(self.processor.mean_c_guess())
                 self.avg_guess_line.set_data([avg_p_guess, avg_p_guess],
                                              [0, pdf(avg_p_guess)])
         self.iterations_remaining -= 1

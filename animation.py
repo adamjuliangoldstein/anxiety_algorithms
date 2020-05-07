@@ -15,10 +15,11 @@ from simulation import Simulation
 # TODO: Fix self.iterationsremaining == 1 in both animated and not animated
 # TODO: Try chopping inputs in half
 # TODO: Measure impact of noise on how reactive you have to be << This could be big
+# TODO: Fit width of lines to 80 char
 
 def main():
     run_results = []
-    for reactivity_ratio in range(1, 100):
+    for reactivity_ratio in range(24, 100):
         sim = Simulation(animate = True, reactivity_ratio = reactivity_ratio)
         sim.start()
         run_results.append([reactivity_ratio, sim.processor.survival_rate()])
