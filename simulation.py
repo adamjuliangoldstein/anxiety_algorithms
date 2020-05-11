@@ -5,6 +5,7 @@ from distribution import Distribution
 from matplotlib import pyplot as plt
 from matplotlib import animation
 from matplotlib import patches
+from matplotlib import ticker
 import numpy as np
 
 class Simulation:
@@ -24,6 +25,10 @@ class Simulation:
             # jakevdp.github.io/blog/2012/08/18/matplotlib-animation-tutorial/
             self.figure = plt.figure()
             ax = plt.axes(xlim = (0, 1), ylim = (0, Distribution.max_y))
+            ax.xaxis.set_major_formatter(ticker.PercentFormatter(1.0))
+            ax.set_yticks([])
+            plt.xlabel("Likelihood of being safe")
+            plt.ylabel("")#("Frequency of encountering")
         
             # The actual Paranoia Line:
             plt.axvline(x = self._actual_paranoia_line(), linewidth = 4,
@@ -81,6 +86,9 @@ class Simulation:
                                            frames = self.iterations_remaining,
                                            interval = 1, repeat = False,
                                            blit = True)
+            # writer = animation.PillowWriter(fps = 2)
+            # anim.save('output.gif', writer = writer)
+            # raise
             plt.show()
         else:
             while self.iterations_remaining > 1:

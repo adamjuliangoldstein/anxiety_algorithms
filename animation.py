@@ -16,6 +16,7 @@ from simulation import Simulation
 # TODO: Try chopping inputs in half
 # TODO: Measure impact of noise on how reactive you have to be << This could be big
 # TODO: Fit width of lines to 80 char
+# TODO: Make setting for saving anim vs showing it
 
 def main():
     run_results = []

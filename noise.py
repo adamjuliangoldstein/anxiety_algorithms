@@ -1,7 +1,7 @@
 from numpy import random
 
 class Noise:
-    def __init__(self, mu = 0, sigma = 0): # Or try mu = -0.05, sigma = 0.1
+    def __init__(self, mu = 0, sigma = 0.1): # Or try mu = -0.05, sigma = 0.1
         self.mu = mu
         self.sigma = sigma
     

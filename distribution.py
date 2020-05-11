@@ -13,7 +13,7 @@ class Distribution:
     max_y = max(abs(min_a), abs(max_a))
     
     def __init__(self, a = None):
-        if a: # If a is specified, use it
+        if a != None: # If a is specified, use it
             self.a = a
         else: # Otherwise pick a at random
             self.a = random.uniform(self.min_a, self.max_a)
