@@ -20,7 +20,7 @@ class Processor:
     def does_attack(self, s):
         # If we haven't seen anything yet, choose randomly on the first one
         if len(self.data_seen) == 0:
-            res = random.choice([True, False])
+            res = (random.random() < self.c_guess)
         else:
             # Pick the threshold output
             # Ex: if there've been 10 outputs:

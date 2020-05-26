@@ -1,7 +1,6 @@
 from simulation import Simulation
 
 # TODO: Label X and Y axes
-# TODO: Update decision to attack in instance 0 based on weighted odds from initial c
 # TODO: Get rid of unnecessary imports in this main file including np
 # TODO: Do I need np._c?
 # TODO: Change distribution to environment?
