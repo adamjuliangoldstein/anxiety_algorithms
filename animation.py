@@ -4,7 +4,6 @@ from simulation import Simulation
 # TODO: Change distribution to environment?
 # TODO: Make pdf an instance variable instead of a method that needs to be called
 # TODO: Add a separate simulation vs. visualizer (visualizer = true/false) and test it works without visualizer
-# TODO: Check that number of new distributions per simulation is accurate
 # TODO: Fix 1/2 alternation of animation being hard-coded into simulation instead of handled by animation
 # TODO: Add internal links and installation instructions to readme
 # TODO: Add link to contagion of concern in readme
