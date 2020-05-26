@@ -69,8 +69,8 @@ class Simulation:
     
     def prep_animation(self):
         self.dist_line.set_data([], [])
-        self.input_tri.set_offsets(np.c_[0, 0])
-        self.after_noise_tri.set_offsets(np.c_[0, 0])
+        self.input_tri.set_offsets([0, 0])
+        self.after_noise_tri.set_offsets([0, 0])
         self.attack_polygon.set_xy([[0, 0], [0, 0], [0, 0], [0, 0]])
         self.chill_polygon.set_xy([[0, 0], [0, 0], [0, 0], [0, 0]])
         self.avg_guess_line.set_data([self.processor.mean_c_guess(),
@@ -110,8 +110,8 @@ class Simulation:
             self.last_input = self.distribution.generate_likelihood()
             self.after_noise = self.noise.adjust(self.last_input)
             if self.animate:
-                self.input_tri.set_offsets(np.c_[self.last_input, 0.1])
-                self.after_noise_tri.set_offsets(np.c_[self.after_noise, 0.05])
+                self.input_tri.set_offsets([self.last_input, 0.1])
+                self.after_noise_tri.set_offsets([self.after_noise, 0.05])
         elif self.last_input:
             # The chance it's a threat is given by the input
             # (actual threat level):
