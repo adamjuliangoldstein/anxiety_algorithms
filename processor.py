@@ -4,7 +4,7 @@ import bisect
 
 class Processor:
     def __init__(self, c_guess = 0.5, chill_adjustment = 0.001,
-                 reactivity_ratio = 24):
+                 reactivity_ratio = 15):
         self.data_seen = []
         self.c_guess = c_guess
         self.previous_c_guesses = []
@@ -40,17 +40,21 @@ class Processor:
             self.times_attacking += 1
         return res
     
-    def survives(self):
+    def survives(self, did_attack):
         self.times_surviving += 1
         # Track the c_guess from this time before it's replaced with a new one
         self.previous_c_guesses.append(self.c_guess)
-        self.c_guess = max(0.0, self.c_guess - self.chill_adjustment)
     
-    def dies(self):
+    def dies(self, did_attack):
         self.times_dying += 1
         # Track the c_guess from this time before it's replaced with a new one
         self.previous_c_guesses.append(self.c_guess)
-        self.c_guess = min(1.0, self.c_guess + self.attack_adjustment)
+        if did_attack:
+            # If we died attacking, chill a little more next time
+            self.c_guess = max(0.0, self.c_guess - self.chill_adjustment)
+        else:
+            # If we died chilling, attack a little more next time
+            self.c_guess = min(1.0, self.c_guess + self.attack_adjustment)
     
     def mean_c_guess(self):
         if self.previous_c_guesses:

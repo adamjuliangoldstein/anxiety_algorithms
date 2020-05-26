@@ -20,7 +20,7 @@ from simulation import Simulation
 
 def main():
     run_results = []
-    for reactivity_ratio in range(24, 100):
+    for reactivity_ratio in range(1, 100):
         sim = Simulation(animate = True, reactivity_ratio = reactivity_ratio)
         sim.start()
         run_results.append([reactivity_ratio, sim.processor.survival_rate()])

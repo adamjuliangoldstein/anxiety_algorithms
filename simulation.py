@@ -9,10 +9,10 @@ from matplotlib import ticker
 import numpy as np
 
 class Simulation:
-    def __init__(self, animate = True, reactivity_ratio = 24, iterations = 5000,
+    def __init__(self, animate = True, reactivity_ratio = 15, iterations = 5000,
                  distributions = 10):
         self.animate = animate
-        self.processor = Processor(reactivity_ratio = reactivity_ratio)
+        self.processor = Processor(c_guess = 0.90909, reactivity_ratio = reactivity_ratio)
         self.reaper = Reaper()
         self.noise = Noise()
         self.distribution = Distribution()
@@ -123,9 +123,9 @@ class Simulation:
             # Adjust the guessed paranoia line depending on whether
             # Things are safer or not than we expected:
             if does_survive:
-                self.processor.survives()
+                self.processor.survives(does_attack)
             else:
-                self.processor.dies()
+                self.processor.dies(does_attack)
                 
             if self.animate:
                 # Draw the Paranoia Line by computing it from the Concern Coefficient:
