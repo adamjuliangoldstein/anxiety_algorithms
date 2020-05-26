@@ -9,7 +9,8 @@ from simulation import Simulation
 # TODO: Check that number of new distributions per simulation is accurate
 # TODO: Fix 1/2 alternation of animation being hard-coded into simulation instead of handled by animation
 # TODO: Is prep_animation needed?
-# TODO: Add readme
+# TODO: Add internal links to readme
+# TODO: Make it a directory/module structure with import dependencies
 # TODO: Change animation.py to the file that handles animation and make a different main file
 # TODO: Fix self.iterationsremaining == 1 in both animated and not animated
 # TODO: Try chopping inputs in half
