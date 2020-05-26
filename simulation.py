@@ -139,7 +139,8 @@ class Simulation:
                                           [p_guess, 0],
                                           [1, 0],
                                           [1, pdf(1)]])
-                avg_p_guess = self.distribution.c_to_p(self.processor.mean_c_guess())
+                mean_c_guess = self.processor.mean_c_guess()
+                avg_p_guess = self.distribution.c_to_p(mean_c_guess)
                 self.avg_guess_line.set_data([avg_p_guess, avg_p_guess],
                                              [0, pdf(avg_p_guess)])
         self.iterations_remaining -= 1

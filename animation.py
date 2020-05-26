@@ -6,7 +6,6 @@ from simulation import Simulation
 # TODO: Add a separate simulation vs. visualizer (visualizer = true/false) and test it works without visualizer
 # TODO: Check that number of new distributions per simulation is accurate
 # TODO: Fix 1/2 alternation of animation being hard-coded into simulation instead of handled by animation
-# TODO: Is prep_animation needed?
 # TODO: Add internal links and installation instructions to readme
 # TODO: Add link to contagion of concern in readme
 # TODO: Make it a directory/module structure with import dependencies
@@ -14,7 +13,6 @@ from simulation import Simulation
 # TODO: Fix self.iterationsremaining == 1 in both animated and not animated
 # TODO: Try chopping inputs in half
 # TODO: Measure impact of noise on how reactive you have to be << This could be big
-# TODO: Fit width of lines to 80 char
 # TODO: Make setting for saving anim vs showing it
 
 def main():

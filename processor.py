@@ -28,7 +28,7 @@ class Processor:
             # and c_guess = 83%,
             # then pick the 8th-most-dangerous (0.7) as the threshold
             threshold_datapoint_i = max(0, round(len(self.data_seen) *
-                                              self.c_guess) - 1)
+                                                 self.c_guess) - 1)
             threshold_datapoint = self.data_seen[threshold_datapoint_i]
             # If the threat likelihood is higher than the 8th-most-dangerous,
             # then attack
