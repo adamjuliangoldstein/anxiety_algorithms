@@ -12,7 +12,7 @@ class Simulation:
     def __init__(self, animate = True, reactivity_ratio = 15, iterations = 5000,
                  distributions = 10):
         self.animate = animate
-        self.processor = Processor(c_guess = 0.90909, reactivity_ratio = reactivity_ratio)
+        self.processor = Processor(reactivity_ratio = reactivity_ratio)
         self.reaper = Reaper()
         self.noise = Noise()
         self.distribution = Distribution()
