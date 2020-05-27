@@ -5,18 +5,28 @@ import bisect
 class Processor:
     def __init__(self, c_guess = 0.5, chill_adjustment = 0.001,
                  reactivity_ratio = 15):
+        # The perceived inputs the agent has encountered:
         self.data_seen = []
+        
+        # The agent's current Concern Zone guess:
         self.c_guess = c_guess
+        
+        # Past Concern Zone guesses:
         self.previous_c_guesses = []
-        self.reactivity_ratio = reactivity_ratio
+        
+        # How much to shrink the Concern Zone:
         self.chill_adjustment = chill_adjustment
+        
+        # How much faster to grow than shrink the Concern Zone:
+        self.reactivity_ratio = reactivity_ratio
         self.attack_adjustment = self.chill_adjustment * reactivity_ratio
+        
         self.times_surviving = 0
         self.times_dying = 0
         self.times_attacking = 0
     
-    # After noise is added, we perceive something with s odds of being safe;
-    # Should we attack it?
+    # After noise is added, the agent perceives something as having s odds of
+    # being safe; should it attack?
     def does_attack(self, s):
         # If we haven't seen anything yet, choose randomly on the first one
         if len(self.data_seen) == 0:
@@ -30,8 +40,8 @@ class Processor:
             threshold_datapoint_i = max(0, round(len(self.data_seen) *
                                                  self.c_guess) - 1)
             threshold_datapoint = self.data_seen[threshold_datapoint_i]
-            # If the threat likelihood is higher than the 8th-most-dangerous,
-            # then attack
+            # If the threat likelihood is higher than e.g. the
+            # 8th-most-dangerous, then attack:
             res = (s < threshold_datapoint)
         
         # Append most recent output to the outputs seen so far, preserving sort:
@@ -42,18 +52,20 @@ class Processor:
     
     def survives(self, did_attack):
         self.times_surviving += 1
-        # Track the c_guess from this time before it's replaced with a new one
+        # Track the Concern Zone guess from this time before it's replaced
+        # with a new one:
         self.previous_c_guesses.append(self.c_guess)
     
     def dies(self, did_attack):
         self.times_dying += 1
-        # Track the c_guess from this time before it's replaced with a new one
+        # Track the Concern Zone guess from this time before it's replaced
+        # with a new one
         self.previous_c_guesses.append(self.c_guess)
         if did_attack:
             # If we died attacking, chill a little more next time
             self.c_guess = max(0.0, self.c_guess - self.chill_adjustment)
         else:
-            # If we died chilling, attack a little more next time
+            # If we died chilling, attack some more next time
             self.c_guess = min(1.0, self.c_guess + self.attack_adjustment)
     
     def mean_c_guess(self):
