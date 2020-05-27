@@ -204,3 +204,4 @@ class Simulation:
 # TODO: Change animation.py to the file that handles animation and make a different main file
 # TODO: Measure impact of noise on how reactive you have to be
 # TODO: Make setting for saving anim vs showing it
+# TODO: Display the reactivity ratio in the animation, not just in the terminal
