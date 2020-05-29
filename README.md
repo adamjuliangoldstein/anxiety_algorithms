@@ -15,6 +15,7 @@ With appropriate calibration of the Reactivity Ratio, this process results in ag
 ## Usage
 
 To choose the Reactivity Ratio manually (e.g. 12): ```python animation.py -r 12```
+
 To iterate through a range of Reactivity Ratios: ```python animation.py```
 
 ## Contributing
