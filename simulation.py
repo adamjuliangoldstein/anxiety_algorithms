@@ -192,9 +192,9 @@ class Simulation:
         
     def end(self):
         plt.close(self.figure)
-        print("Reactivity ratio", self.processor.reactivity_ratio,
-              "Survivals: ", self.processor.survival_rate(),
-              "Attacks:", self.processor.attack_rate())
+        print("With a Reactivity Ratio of", self.processor.reactivity_ratio,
+              "the agent had survival rate", self.processor.survival_rate(),
+              "and atttack rate", self.processor.attack_rate())
               
 # Things that would be nice:
 # TODO: Label X and Y axes
@@ -205,3 +205,4 @@ class Simulation:
 # TODO: Measure impact of noise on how reactive you have to be
 # TODO: Make setting for saving anim vs showing it
 # TODO: Display the reactivity ratio in the animation, not just in the terminal
+# TODO: Make more things configurable from the command line

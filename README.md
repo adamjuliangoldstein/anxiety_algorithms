@@ -12,11 +12,10 @@ After the agent decides whether to attack, it finds out whether it survived unsc
 
 With appropriate calibration of the Reactivity Ratio, this process results in agents achieving near-optimal rates of survival, even when the agents' perceptions are biased and/or inaccurate and/or the environment is rapidly changing.
 
-This code 
-
 ## Usage
 
-```python animation.py```
+To choose the Reactivity Ratio manually (e.g. 12): ```python animation.py -r 12```
+To iterate through a range of Reactivity Ratios: ```python animation.py```
 
 ## Contributing
 Pull requests are welcome.
